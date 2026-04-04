@@ -1,0 +1,186 @@
+Build a complete, production-ready Hospital Management System called "MediCare HMS" with a beautiful modern UI and full REST API backend. This is a resume portfolio project that must look professional and impressive.
+
+=== TECH STACK ===
+Frontend: React.js with Tailwind CSS
+Backend: Node.js with Express.js
+Database: PostgreSQL (use Replit's built-in database)
+Auth: JWT tokens stored in localStorage
+Extra: Axios for API calls, React Router for navigation, Recharts for dashboard charts
+
+=== UI DESIGN REQUIREMENTS (Very Important) ===
+- Color scheme: Deep navy blue (#0F172A) sidebar + white content area + blue/teal accents (#0EA5E9)
+- Modern card-based layout with subtle shadows
+- Sidebar navigation with icons for each module
+- Responsive design that works on mobile and desktop
+- Loading spinners while data fetches
+- Toast notifications for success/error messages
+- Smooth hover effects on buttons and cards
+- Professional data tables with pagination
+- Dashboard with 4 stat cards + 2 charts (line chart for appointments, pie chart for billing)
+
+=== PAGES TO BUILD ===
+
+1. LOGIN PAGE
+- Centered card with MediCare HMS logo/title
+- Username + password fields with eye toggle
+- Role selector (Admin / Doctor / Patient / Receptionist)
+- Animated gradient background
+- "Login" button with loading state
+- Demo credentials shown below form
+
+2. DASHBOARD PAGE (after login)
+- Welcome banner with user name and role
+- 4 stat cards: Total Patients, Total Doctors, Today's Appointments, Total Revenue
+- Line chart: Appointments per day (last 7 days)
+- Pie chart: Appointment status breakdown (Scheduled/Completed/Cancelled)
+- Recent appointments table (last 5)
+- Quick action buttons: Book Appointment, Add Patient, Generate Bill
+
+3. PATIENTS PAGE
+- Search bar to filter patients by name
+- Table with columns: ID, Name, Age, Blood Group, Phone, Actions
+- Add Patient button → opens modal form
+- Edit and View buttons per row
+- View opens a patient detail modal with full info + appointment history
+
+4. DOCTORS PAGE
+- Cards layout (not table) showing doctor profile cards
+- Each card: Doctor name, specialization, department, experience, availability badge (green/red)
+- Filter by department dropdown
+- Add Doctor button → modal form
+- Click card → see doctor's appointments for today
+
+5. APPOINTMENTS PAGE
+- Calendar-style date filter at top
+- Table: Patient Name, Doctor Name, Date, Time Slot, Status badge (colored), Actions
+- Book Appointment button → multi-step form (Step 1: select patient, Step 2: select doctor + date + slot, Step 3: confirm)
+- Cancel and Complete buttons with confirmation dialog
+- Status badges: blue=Scheduled, green=Completed, red=Cancelled
+
+6. PRESCRIPTIONS PAGE
+- Table: Patient, Doctor, Diagnosis, Date, View button
+- Issue Prescription button (only for Doctor role)
+- View opens full prescription detail modal with print button
+
+7. BILLING PAGE
+- Table: Patient, Appointment, Consultation Fee, Medicine Cost, Total, Status badge, Actions
+- Generate Bill button
+- Pay button changes status to Paid (green badge)
+- Summary cards at top: Total Billed, Total Collected, Pending Amount
+
+8. PROFILE PAGE
+- User profile card with avatar (initials-based)
+- Display: name, email, role, joined date
+- Change password form
+
+=== BACKEND API (Node.js + Express) ===
+
+Build these REST APIs:
+
+AUTH:
+POST /api/auth/login - returns JWT token + user info
+POST /api/auth/register - register new user
+
+PATIENTS:
+GET /api/patients - list all (paginated, searchable)
+GET /api/patients/:id - get one
+POST /api/patients - create
+PUT /api/patients/:id - update
+GET /api/patients/:id/history - appointment history
+
+DOCTORS:
+GET /api/doctors - list all
+GET /api/doctors/:id/slots?date=YYYY-MM-DD - available slots
+POST /api/doctors - create
+PUT /api/doctors/:id/availability - toggle
+
+APPOINTMENTS:
+GET /api/appointments - list all
+POST /api/appointments - book new
+PUT /api/appointments/:id/cancel - cancel
+PUT /api/appointments/:id/complete - complete
+GET /api/appointments/doctor/:id - by doctor
+GET /api/appointments/today - today's count
+
+PRESCRIPTIONS:
+GET /api/prescriptions - list
+POST /api/prescriptions - create
+GET /api/prescriptions/patient/:id - by patient
+
+BILLING:
+GET /api/bills - list all
+POST /api/bills/generate - generate bill
+PUT /api/bills/:id/pay - mark paid
+GET /api/bills/stats - total revenue, pending
+
+DASHBOARD:
+GET /api/dashboard/stats - counts for all modules
+GET /api/dashboard/chart-data - last 7 days appointment data
+
+=== DATABASE TABLES (PostgreSQL) ===
+
+users: id, username, password(hashed), email, role, is_active, created_at
+departments: id, name
+patients: id, user_id, full_name, dob, gender, blood_group, phone, address
+doctors: id, user_id, dept_id, full_name, specialization, experience_yrs, is_available
+appointments: id, patient_id, doctor_id, appointment_date, time_slot, status, notes, created_at
+prescriptions: id, appointment_id, doctor_id, diagnosis, medicines, dosage_instructions, issued_date
+bills: id, patient_id, appointment_id, consultation_fee, medicine_cost, total_amount, payment_status, bill_date
+
+=== ROLE-BASED ACCESS ===
+ADMIN: access to everything
+DOCTOR: view patients, manage own appointments, issue prescriptions
+PATIENT: view own appointments, prescriptions, bills
+RECEPTIONIST: manage patients, book appointments, generate bills
+
+=== SEED DATA (Important) ===
+Insert this demo data so HR can test immediately:
+
+Demo users:
+- admin / admin123 (ADMIN role)
+- doctor1 / doctor123 (DOCTOR role) - Dr. Arjun Kumar, Cardiology
+- patient1 / patient123 (PATIENT role) - Ravi Sharma
+- receptionist1 / rec123 (RECEPTIONIST role)
+
+Insert 5 sample patients, 4 doctors across 3 departments, 10 appointments with mixed statuses, 5 prescriptions, 8 bills
+
+=== EXTRA POLISH ===
+- Add a landing page BEFORE login with: hero section, features section, how it works, contact — so when HR opens the link they see a professional landing page first
+- Add page title "MediCare HMS | Hospital Management System" in browser tab
+- Add favicon (use a medical cross emoji or simple SVG)
+- Mobile responsive navbar that collapses to hamburger menu
+- 404 page with "Page Not Found" and back to home button
+- Smooth page transitions
+- All forms have proper validation with error messages shown below fields
+- Passwords hidden by default with show/hide toggle
+- Session expires after 24 hours, redirects to login
+
+=== FILE STRUCTURE ===
+/client (React frontend)
+  /src
+    /components (Navbar, Sidebar, Modal, Table, StatCard, Charts)
+    /pages (Login, Dashboard, Patients, Doctors, Appointments, Prescriptions, Billing, Profile, Landing, NotFound)
+    /context (AuthContext for global auth state)
+    /api (axios instance with JWT interceptor)
+    /utils (formatDate, formatCurrency helpers)
+  package.json
+
+/server (Node.js backend)
+  /routes (auth, patients, doctors, appointments, prescriptions, bills, dashboard)
+  /middleware (auth.js for JWT verify, roleCheck.js)
+  /db (database.js connection + schema.sql)
+  server.js
+  package.json
+
+README.md (with screenshots placeholder, setup instructions, API docs table, live demo link)
+
+=== IMPORTANT RULES ===
+1. Make it fully working end-to-end — login must work, data must show on dashboard
+2. All API calls from frontend must use the JWT token from login
+3. Show loading states everywhere data is being fetched
+4. Handle errors gracefully — show user-friendly error messages
+5. The landing page must look like a real SaaS product homepage
+6. Use environment variables for JWT secret and database URL
+7. Make sure the app runs on a single Replit URL (serve React build from Express)
+
+Build everything completely. Do not leave placeholder comments. Every page must be functional.

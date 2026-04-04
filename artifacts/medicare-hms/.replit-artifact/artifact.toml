@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "MediCare HMS"
+version = "1.0.0"
+id = "artifacts/medicare-hms"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23525
+
+[services.development]
+run = "pnpm --filter @workspace/medicare-hms run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/medicare-hms", "run", "build" ]
+publicDir = "artifacts/medicare-hms/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23525"
+BASE_PATH = "/"

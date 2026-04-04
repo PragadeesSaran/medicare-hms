@@ -3,13 +3,30 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: MediCare HMS API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: dashboard
+    description: Dashboard operations
+  - name: patients
+    description: Patient operations
+  - name: doctors
+    description: Doctor operations
+  - name: appointments
+    description: Appointment operations
+  - name: prescriptions
+    description: Prescription operations
+  - name: bills
+    description: Billing operations
+  - name: departments
+    description: Department operations
+
 paths:
   /healthz:
     get:
@@ -24,7 +41,678 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth endpoints
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # Dashboard
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/chart-data:
+    get:
+      operationId: getDashboardChartData
+      tags: [dashboard]
+      summary: Get chart data for dashboard
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChartData"
+
+  /dashboard/recent-appointments:
+    get:
+      operationId: getDashboardRecentAppointments
+      tags: [dashboard]
+      summary: Get recent appointments for dashboard
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Recent appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppointmentDetail"
+
+  # Departments
+  /departments:
+    get:
+      operationId: getDepartments
+      tags: [departments]
+      summary: List all departments
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+
+  # Patients
+  /patients:
+    get:
+      operationId: getPatients
+      tags: [patients]
+      summary: List all patients
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of patients
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientListResponse"
+
+    post:
+      operationId: createPatient
+      tags: [patients]
+      summary: Create a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePatientBody"
+      responses:
+        "201":
+          description: Patient created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+
+  /patients/{id}:
+    get:
+      operationId: getPatient
+      tags: [patients]
+      summary: Get patient by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Patient detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "404":
+          description: Patient not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      operationId: updatePatient
+      tags: [patients]
+      summary: Update a patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatientBody"
+      responses:
+        "200":
+          description: Patient updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+
+  /patients/{id}/history:
+    get:
+      operationId: getPatientHistory
+      tags: [patients]
+      summary: Get patient appointment history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppointmentDetail"
+
+  # Doctors
+  /doctors:
+    get:
+      operationId: getDoctors
+      tags: [doctors]
+      summary: List all doctors
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: department
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of doctors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DoctorDetail"
+
+    post:
+      operationId: createDoctor
+      tags: [doctors]
+      summary: Create a doctor
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDoctorBody"
+      responses:
+        "201":
+          description: Doctor created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorDetail"
+
+  /doctors/{id}:
+    get:
+      operationId: getDoctor
+      tags: [doctors]
+      summary: Get doctor by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Doctor detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorDetail"
+
+  /doctors/{id}/slots:
+    get:
+      operationId: getDoctorSlots
+      tags: [doctors]
+      summary: Get available slots for a doctor
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Available slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /doctors/{id}/availability:
+    put:
+      operationId: updateDoctorAvailability
+      tags: [doctors]
+      summary: Toggle doctor availability
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDoctorAvailabilityBody"
+      responses:
+        "200":
+          description: Availability updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorDetail"
+
+  /doctors/{id}/appointments:
+    get:
+      operationId: getDoctorAppointments
+      tags: [doctors]
+      summary: Get appointments for a doctor
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Doctor's appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppointmentDetail"
+
+  # Appointments
+  /appointments:
+    get:
+      operationId: getAppointments
+      tags: [appointments]
+      summary: List all appointments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentListResponse"
+
+    post:
+      operationId: createAppointment
+      tags: [appointments]
+      summary: Book a new appointment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentBody"
+      responses:
+        "201":
+          description: Appointment booked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentDetail"
+
+  /appointments/today:
+    get:
+      operationId: getTodayAppointmentsCount
+      tags: [appointments]
+      summary: Get today's appointment count
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Today's count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayCountResponse"
+
+  /appointments/{id}/cancel:
+    put:
+      operationId: cancelAppointment
+      tags: [appointments]
+      summary: Cancel an appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentDetail"
+
+  /appointments/{id}/complete:
+    put:
+      operationId: completeAppointment
+      tags: [appointments]
+      summary: Complete an appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentDetail"
+
+  # Prescriptions
+  /prescriptions:
+    get:
+      operationId: getPrescriptions
+      tags: [prescriptions]
+      summary: List all prescriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: query
+          schema:
+            type: integer
+        - name: doctorId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of prescriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PrescriptionDetail"
+
+    post:
+      operationId: createPrescription
+      tags: [prescriptions]
+      summary: Create a prescription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePrescriptionBody"
+      responses:
+        "201":
+          description: Prescription created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrescriptionDetail"
+
+  /prescriptions/{id}:
+    get:
+      operationId: getPrescription
+      tags: [prescriptions]
+      summary: Get prescription by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Prescription detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrescriptionDetail"
+
+  # Billing
+  /bills:
+    get:
+      operationId: getBills
+      tags: [bills]
+      summary: List all bills
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of bills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BillDetail"
+
+    post:
+      operationId: createBill
+      tags: [bills]
+      summary: Generate a bill
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBillBody"
+      responses:
+        "201":
+          description: Bill generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillDetail"
+
+  /bills/stats:
+    get:
+      operationId: getBillStats
+      tags: [bills]
+      summary: Get billing statistics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Bill statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillStats"
+
+  /bills/{id}/pay:
+    put:
+      operationId: payBill
+      tags: [bills]
+      summary: Mark bill as paid
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bill paid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillDetail"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +722,499 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+      required:
+        - username
+        - password
+
+    RegisterBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        fullName:
+          type: string
+      required:
+        - username
+        - password
+        - email
+        - role
+        - fullName
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        fullName:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - username
+        - email
+        - role
+        - fullName
+        - createdAt
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+
+    DashboardStats:
+      type: object
+      properties:
+        totalPatients:
+          type: integer
+        totalDoctors:
+          type: integer
+        todayAppointments:
+          type: integer
+        totalRevenue:
+          type: number
+        pendingBills:
+          type: integer
+        totalPrescriptions:
+          type: integer
+      required:
+        - totalPatients
+        - totalDoctors
+        - todayAppointments
+        - totalRevenue
+        - pendingBills
+        - totalPrescriptions
+
+    ChartDataPoint:
+      type: object
+      properties:
+        date:
+          type: string
+        count:
+          type: integer
+        scheduled:
+          type: integer
+        completed:
+          type: integer
+        cancelled:
+          type: integer
+      required:
+        - date
+        - count
+        - scheduled
+        - completed
+        - cancelled
+
+    ChartData:
+      type: object
+      properties:
+        appointmentsByDay:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartDataPoint"
+        statusBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusCount"
+      required:
+        - appointmentsByDay
+        - statusBreakdown
+
+    StatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+      required:
+        - status
+        - count
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        fullName:
+          type: string
+        dob:
+          type: ["string", "null"]
+        gender:
+          type: ["string", "null"]
+        bloodGroup:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - fullName
+        - createdAt
+
+    PatientListResponse:
+      type: object
+      properties:
+        patients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Patient"
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - patients
+        - total
+        - page
+        - totalPages
+
+    CreatePatientBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        dob:
+          type: string
+        gender:
+          type: string
+        bloodGroup:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+      required:
+        - fullName
+
+    UpdatePatientBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        dob:
+          type: string
+        gender:
+          type: string
+        bloodGroup:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+
+    DoctorDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        departmentId:
+          type: ["integer", "null"]
+        fullName:
+          type: string
+        specialization:
+          type: ["string", "null"]
+        experienceYrs:
+          type: ["integer", "null"]
+        isAvailable:
+          type: boolean
+        departmentName:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+      required:
+        - id
+        - fullName
+        - isAvailable
+
+    CreateDoctorBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        specialization:
+          type: string
+        departmentId:
+          type: integer
+        experienceYrs:
+          type: integer
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - fullName
+        - specialization
+
+    UpdateDoctorAvailabilityBody:
+      type: object
+      properties:
+        isAvailable:
+          type: boolean
+      required:
+        - isAvailable
+
+    AppointmentDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        doctorId:
+          type: integer
+        appointmentDate:
+          type: string
+        timeSlot:
+          type: string
+        status:
+          type: string
+        notes:
+          type: ["string", "null"]
+        patientName:
+          type: string
+        doctorName:
+          type: string
+        departmentName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - patientId
+        - doctorId
+        - appointmentDate
+        - timeSlot
+        - status
+        - patientName
+        - doctorName
+        - createdAt
+
+    AppointmentListResponse:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppointmentDetail"
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - appointments
+        - total
+        - page
+        - totalPages
+
+    CreateAppointmentBody:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        doctorId:
+          type: integer
+        appointmentDate:
+          type: string
+        timeSlot:
+          type: string
+        notes:
+          type: string
+      required:
+        - patientId
+        - doctorId
+        - appointmentDate
+        - timeSlot
+
+    TodayCountResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+        - count
+
+    PrescriptionDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        appointmentId:
+          type: ["integer", "null"]
+        doctorId:
+          type: integer
+        patientId:
+          type: integer
+        diagnosis:
+          type: string
+        medicines:
+          type: string
+        dosageInstructions:
+          type: ["string", "null"]
+        issuedDate:
+          type: string
+        patientName:
+          type: string
+        doctorName:
+          type: string
+      required:
+        - id
+        - doctorId
+        - patientId
+        - diagnosis
+        - medicines
+        - issuedDate
+        - patientName
+        - doctorName
+
+    CreatePrescriptionBody:
+      type: object
+      properties:
+        appointmentId:
+          type: integer
+        doctorId:
+          type: integer
+        patientId:
+          type: integer
+        diagnosis:
+          type: string
+        medicines:
+          type: string
+        dosageInstructions:
+          type: string
+      required:
+        - doctorId
+        - patientId
+        - diagnosis
+        - medicines
+
+    BillDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        appointmentId:
+          type: ["integer", "null"]
+        consultationFee:
+          type: number
+        medicineCost:
+          type: number
+        totalAmount:
+          type: number
+        paymentStatus:
+          type: string
+        billDate:
+          type: string
+        patientName:
+          type: string
+        doctorName:
+          type: ["string", "null"]
+      required:
+        - id
+        - patientId
+        - consultationFee
+        - medicineCost
+        - totalAmount
+        - paymentStatus
+        - billDate
+        - patientName
+
+    CreateBillBody:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        appointmentId:
+          type: integer
+        consultationFee:
+          type: number
+        medicineCost:
+          type: number
+      required:
+        - patientId
+        - consultationFee
+        - medicineCost
+
+    BillStats:
+      type: object
+      properties:
+        totalBilled:
+          type: number
+        totalCollected:
+          type: number
+        pendingAmount:
+          type: number
+        totalBills:
+          type: integer
+        paidBills:
+          type: integer
+        pendingBills:
+          type: integer
+      required:
+        - totalBilled
+        - totalCollected
+        - pendingAmount
+        - totalBills
+        - paidBills
+        - pendingBills
