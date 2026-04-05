@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetPatients, useCreatePatient } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,7 +23,7 @@ export default function Patients() {
   const queryClient = useQueryClient();
 
   // Simple debounce logic
-  useState(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -41,7 +41,7 @@ export default function Patients() {
         queryClient.invalidateQueries({ queryKey: getGetPatientsQueryKey() });
       },
       onError: (error) => {
-        toast({ variant: "destructive", title: "Failed to create patient", description: error.data?.error || "Unknown error" });
+        toast({ variant: "destructive", title: "Failed to create patient", description: (error.data as { error?: string })?.error || "Unknown error" });
       }
     }
   });

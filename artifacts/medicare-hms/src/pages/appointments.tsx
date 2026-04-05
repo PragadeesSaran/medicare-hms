@@ -53,7 +53,7 @@ export default function Appointments() {
         queryClient.invalidateQueries({ queryKey: getGetAppointmentsQueryKey() });
       },
       onError: (error) => {
-        toast({ variant: "destructive", title: "Failed to book appointment", description: error.data?.error || "Unknown error" });
+        toast({ variant: "destructive", title: "Failed to book appointment", description: (error.data as { error?: string })?.error || "Unknown error" });
       }
     }
   });

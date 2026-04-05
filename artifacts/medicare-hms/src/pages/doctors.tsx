@@ -38,7 +38,7 @@ export default function Doctors() {
         queryClient.invalidateQueries({ queryKey: getGetDoctorsQueryKey() });
       },
       onError: (error) => {
-        toast({ variant: "destructive", title: "Failed to create doctor", description: error.data?.error || "Unknown error" });
+        toast({ variant: "destructive", title: "Failed to create doctor", description: (error.data as { error?: string })?.error || "Unknown error" });
       }
     }
   });

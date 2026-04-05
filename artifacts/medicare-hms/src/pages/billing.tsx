@@ -95,8 +95,8 @@ export default function Billing() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {billsData?.bills && billsData.bills.length > 0 ? (
-                    billsData.bills.map((bill) => (
+                  {billsData && billsData.length > 0 ? (
+                    billsData.map((bill) => (
                       <TableRow key={bill.id} className="hover:bg-slate-50 transition-colors">
                         <TableCell className="font-mono text-xs text-slate-500">
                           INV-{bill.id.toString().padStart(6, '0')}

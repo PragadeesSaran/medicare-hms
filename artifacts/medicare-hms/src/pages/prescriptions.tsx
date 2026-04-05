@@ -50,8 +50,8 @@ export default function Prescriptions() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data?.prescriptions && data.prescriptions.length > 0 ? (
-                    data.prescriptions.map((rx) => (
+                  {data && data.length > 0 ? (
+                    data.map((rx) => (
                       <TableRow key={rx.id} className="hover:bg-slate-50 transition-colors">
                         <TableCell className="font-mono text-xs text-slate-500">
                           RX-{rx.id.toString().padStart(5, '0')}
