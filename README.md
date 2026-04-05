@@ -6,7 +6,9 @@ A complete, production-ready Hospital Management System built with React, Node.j
 
 ## Live Demo
 
-> Add your deployed URL here once published
+**GitHub:** [github.com/PragadeesSaran/medicare-hms](https://github.com/PragadeesSaran/medicare-hms)
+
+> Add your deployed URL here once published on Vercel/Render
 
 **Demo Credentials:**
 
