@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm build",
-  "outputDirectory": "dist/public",
+  "buildCommand": "pnpm install && pnpm -r --if-present run build",
+  "outputDirectory": "artifacts/medicare-hms/dist/public",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.mjs" },
     { "source": "/:path*", "destination": "/index.html" }
