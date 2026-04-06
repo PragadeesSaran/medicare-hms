@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm --filter @workspace/db run push-force && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/medicare-hms run build && node -e \"import('./scripts/src/seed.ts')\""
+  "buildCommand": "pnpm install && pnpm --filter @workspace/db run push-force && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/medicare-hms run build",
   "outputDirectory": "artifacts/medicare-hms/dist/public",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.mjs" },
