@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm -r --if-present run build",
+  "buildCommand": "pnpm install && pnpm --filter @workspace/api-server run build && pnpm --filter medicare-hms run build",
   "outputDirectory": "artifacts/medicare-hms/dist/public",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.mjs" },
@@ -12,3 +12,4 @@
     }
   }
 }
+
