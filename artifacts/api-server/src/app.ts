@@ -4,7 +4,6 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-// pino-http is a CJS module — use createRequire for compatibility
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const pinoHttp = require("pino-http") as typeof import("pino-http").default;
@@ -34,6 +33,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", router);
+app.use("/", router);
 
 export default app;
